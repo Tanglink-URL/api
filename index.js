@@ -62,14 +62,16 @@ app.get('/:shortURL', async (req, res) => {
 
     if(result == null){
         linkModel.find({_id: shortURL}).then( async (data) =>{
-            
+            if(data.length == 0){
+                res.status(400).send('URL does not exist')
+            }
+
             res.redirect(data[0].longURL)
 
             longURL = data[0].longURL
 
-            if(data.length != 0){
-                await redisSet('Tanglink', shortURL, longURL)
-            }
+            await redisSet('Tanglink', shortURL, longURL)
+            
         })
     }else{
         res.redirect(result)
