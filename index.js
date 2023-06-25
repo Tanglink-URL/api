@@ -91,4 +91,41 @@ const linkModel =  mongoose.model('Link', linkSchema)
 
 
 
+//set a value in redis
+async function redisSet(key, field, value){
+
+    let redis = require('redis')
+
+    let client = redis.createClient({
+        url: process.env.REDIS_URL
+    })
+
+    client.connect()
+
+    let result = await client.hSet(key, field, value)
+
+    client.disconnect()
+
+    return result
+}
+
+//get a value in redis
+async function redisGet(key, field){
+
+    let redis = require('redis')
+
+    let client = redis.createClient({
+        url: process.env.REDIS_URL
+    })
+
+    client.connect()
+
+    let result = await client.hGet(key, field)
+
+    client.disconnect()
+
+    return result
+}
+
+
 
