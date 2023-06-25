@@ -6,6 +6,12 @@ const uri = "mongodb+srv://" + process.env.MONGOUSERNAME + ":" + process.env.MON
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const redis = require('redis')
+
+const redisClient = redis.createClient({
+    url: process.env.REDIS_URL
+})
+
 const express = require('express')
 const app = express()
 
@@ -47,19 +53,34 @@ app.post('/create', (req, res) =>{
 })
 
 // to acess a shortURL
-app.get('/:shortURL', (req, res) => {
+app.get('/:shortURL', async (req, res) => {
     let shortURL = req.params.shortURL
 
-    linkModel.find({_id: shortURL}).then((data) =>{
-        
-        res.redirect(data[0].longURL)
-    })
+    let result = await redisGet('Tanglink', shortURL)
+
+    let longURL
+
+    if(result == null){
+        linkModel.find({_id: shortURL}).then( async (data) =>{
+            
+            res.redirect(data[0].longURL)
+
+            longURL = data[0].longURL
+
+            if(data.length != 0){
+                await redisSet('Tanglink', shortURL, longURL)
+            }
+        })
+    }else{
+        res.redirect(result)
+    }
 
 })
 
 
 app.listen(PORT, () => console.log(`Live on port ${PORT}`))
 connectMongo()
+redisClient.connect()
 
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -94,17 +115,7 @@ const linkModel =  mongoose.model('Link', linkSchema)
 //set a value in redis
 async function redisSet(key, field, value){
 
-    let redis = require('redis')
-
-    let client = redis.createClient({
-        url: process.env.REDIS_URL
-    })
-
-    client.connect()
-
-    let result = await client.hSet(key, field, value)
-
-    client.disconnect()
+    let result = await redisClient.hSet(key, field, value)
 
     return result
 }
@@ -112,17 +123,7 @@ async function redisSet(key, field, value){
 //get a value in redis
 async function redisGet(key, field){
 
-    let redis = require('redis')
-
-    let client = redis.createClient({
-        url: process.env.REDIS_URL
-    })
-
-    client.connect()
-
-    let result = await client.hGet(key, field)
-
-    client.disconnect()
+    let result = await redisClient.hGet(key, field)
 
     return result
 }
