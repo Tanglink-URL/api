@@ -28,9 +28,10 @@ app.post('/create', (req, res) =>{
     const newDoc = new linkModel({_id: shortURL, longURL: longURL, clickCount: 0})
 
     try{
-        newDoc.save()
-        res.send('SAVED')
-    }catch(e){
+        newDoc.save().then((newDoc) => {
+            res.status(201).send('SAVED!')
+            })
+        }catch(e){
         res.send({status: "NOT SAVED", error: e})
     }
 })
