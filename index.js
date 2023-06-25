@@ -32,7 +32,7 @@ app.post('/create', (req, res) =>{
             res.status(201).send('SAVED!')
             })
         }catch(e){
-        res.send({status: "NOT SAVED", error: e})
+            res.status(400).send(e)
     }
 })
 
