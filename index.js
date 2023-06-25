@@ -3,6 +3,7 @@ dotenv.config();
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://" + process.env.MONGOUSERNAME + ":" + process.env.MONGOPASSWORD + "@tanglink.pqrecr6.mongodb.net/?retryWrites=true&w=majority";
+const mongoose = require('mongoose')
 
 const app = require('express')()
 
