@@ -27,13 +27,19 @@ app.post('/create', (req, res) =>{
 
     const newDoc = new linkModel({_id: shortURL, longURL: longURL, clickCount: 0})
 
-    try{
-        newDoc.save().then((newDoc) => {
-            res.status(201).send('SAVED!')
-            })
-        }catch(e){
-            res.status(400).send(e)
-    }
+    linkModel.find({_id: shortURL}).then((data) =>{
+        if(data.length == 0){
+            try{
+                newDoc.save().then((newDoc) => {
+                    res.status(201).send('SAVED!')
+                    })
+                }catch(e){
+                    res.status(400).send(e)
+            }
+        }else{
+            res.status(400).send('Short URL is already taken, please choose another name.')
+        }
+    })
 })
 
 // to acess a shortURL
