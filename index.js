@@ -36,6 +36,17 @@ app.post('/create', (req, res) =>{
     }
 })
 
+// to acess a shortURL
+app.get('/:shortURL', (req, res) => {
+    let shortURL = req.params.shortURL
+
+    let longurl = linkModel.find({_id: shortURL}).then((data) =>{
+        
+        res.redirect(data[0].longURL)
+    })
+
+})
+
 
 app.listen(PORT, () => console.log(`Live on port ${PORT}`))
 connectMongo()
