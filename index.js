@@ -62,7 +62,7 @@ app.post('/create', (req, res) =>{
                     res.status(400).send(e)
             }
         }else{
-            res.status(400).send('Short URL is already taken, please choose another name.')
+            res.status(403).send('Short URL is already taken, please choose another name.')
         }
     })
 })
